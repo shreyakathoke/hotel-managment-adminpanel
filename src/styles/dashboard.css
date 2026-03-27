@@ -1,0 +1,148 @@
+.dashboard-wrap {
+  background: #fbfbfd;
+  min-height: 100%;
+}
+
+.page-title {
+  font-weight: 900;
+  letter-spacing: -0.02em;
+}
+
+.page-subtitle {
+  color: #6c757d;
+  font-size: 0.95rem;
+}
+
+.soft-card {
+  border: 0;
+  border-radius: 18px;
+  background: #fff;
+  box-shadow:
+    0 10px 30px rgba(16, 24, 40, 0.06),
+    0 2px 8px rgba(16, 24, 40, 0.04);
+}
+
+.soft-card-header {
+  background: transparent;
+  border: 0;
+  padding: 18px 18px 10px;
+}
+
+.soft-card-title {
+  font-weight: 800;
+}
+
+.soft-card-badge {
+  width: 34px;
+  height: 34px;
+  border-radius: 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: #f3f6ff;
+  color: #2563eb;
+}
+
+.metric-card {
+  border: 0;
+  border-radius: 18px;
+  background: #fff;
+  box-shadow:
+    0 10px 30px rgba(16, 24, 40, 0.06),
+    0 2px 8px rgba(16, 24, 40, 0.04);
+}
+
+.metric-icon {
+  width: 54px;
+  height: 54px;
+  border-radius: 16px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.4rem;
+}
+
+.metric-title {
+  color: #6c757d;
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.metric-value {
+  font-size: 1.6rem;
+  font-weight: 900;
+  letter-spacing: -0.02em;
+}
+
+.btn-soft {
+  border-radius: 12px;
+  padding: 10px 14px;
+  font-weight: 700;
+}
+
+.btn-soft-primary {
+  border-radius: 12px;
+  padding: 10px 14px;
+  font-weight: 800;
+  box-shadow: 0 10px 25px rgba(13, 110, 253, 0.2);
+}
+
+.table-soft thead th {
+  color: #6c757d;
+  font-weight: 800;
+  font-size: 0.85rem;
+  border-top: 0;
+  border-bottom: 1px solid rgba(0,0,0,0.06);
+}
+
+.table-soft tbody td {
+  border-color: rgba(0,0,0,0.06);
+}
+
+.barlist {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.barrow {
+  display: grid;
+  grid-template-columns: 1fr 1.4fr 50px;
+  gap: 14px;
+  align-items: center;
+}
+
+.barrow-label {
+  font-weight: 700;
+  color: #343a40;
+}
+
+.barrow-track {
+  height: 10px;
+  border-radius: 999px;
+  background: #eef1f6;
+  overflow: hidden;
+}
+
+.barrow-fill {
+  height: 100%;
+  border-radius: 999px;
+}
+
+.barrow-value {
+  text-align: end;
+  font-weight: 900;
+  color: #343a40;
+}
+
+@media (max-width: 576px) {
+  .barrow {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+  .barrow-value {
+    text-align: start;
+    color: #6c757d;
+    font-weight: 800;
+  }
+}

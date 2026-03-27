@@ -1,0 +1,54 @@
+.soft-card {
+  border: 0;
+  border-radius: 18px;
+  background: #ffffff;
+  box-shadow:
+    0 10px 30px rgba(16, 24, 40, 0.06),
+    0 2px 8px rgba(16, 24, 40, 0.04);
+}
+
+.users-search {
+  width: 260px;
+  border-radius: 12px;
+}
+
+.users-table thead th {
+  font-weight: 700;
+  font-size: 0.85rem;
+  color: #6c757d;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+  background: #fff;
+}
+
+.users-table tbody tr:hover {
+  background: #f9fafc;
+}
+
+.user-avatar {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: #eef4ff;
+  color: #2563eb;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+}
+
+.btn-action-view {
+  border-radius: 10px;
+  background: #eef4ff;
+}
+
+.btn-action-delete {
+  border-radius: 10px;
+  background: #fff1f1;
+  border: 0;
+}
+
+@media (max-width: 768px) {
+  .users-search {
+    width: 100%;
+  }
+}

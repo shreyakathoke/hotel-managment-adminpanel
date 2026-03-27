@@ -1,0 +1,79 @@
+/* Shared card style */
+.soft-card {
+  border: 0;
+  border-radius: 18px;
+  background: #ffffff;
+  box-shadow:
+    0 10px 30px rgba(16, 24, 40, 0.06),
+    0 2px 8px rgba(16, 24, 40, 0.04);
+}
+
+/* Header layout */
+.contacts-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.contact-search {
+  border-radius: 12px;
+  padding: 12px 14px;
+}
+
+/* Table */
+.contact-table thead th {
+  font-weight: 800;
+  font-size: 0.85rem;
+  color: #6c757d;
+  background: #fff;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+  white-space: nowrap;
+}
+
+.contact-table tbody tr:hover {
+  background: #f9fafc;
+}
+
+/* Avatar */
+.user-avatar {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: #eef4ff;
+  color: #2563eb;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+}
+
+/* Card header */
+.soft-card-header {
+  background: transparent;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+  padding: 16px 18px;
+}
+
+/* Action buttons */
+.contact-action {
+  border-radius: 10px;
+}
+
+/* Pagination */
+.contacts-pagination .page-link {
+  border-radius: 10px;
+  margin: 0 4px;
+}
+
+.contacts-pagination .page-item.active .page-link {
+  font-weight: 800;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .contacts-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}

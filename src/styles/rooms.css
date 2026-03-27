@@ -1,0 +1,33 @@
+.soft-card {
+  border: 0;
+  border-radius: 18px;
+  background: #ffffff;
+  box-shadow:
+    0 10px 30px rgba(16, 24, 40, 0.06),
+    0 2px 8px rgba(16, 24, 40, 0.04);
+}
+
+.rooms-table thead th {
+  font-weight: 800;
+  font-size: 0.85rem;
+  color: #6c757d;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.rooms-table tbody tr:hover {
+  background: #f9fafc;
+}
+
+.btn-outline-primary,
+.btn-outline-warning,
+.btn-outline-danger {
+  border-radius: 8px;
+  min-width: 70px;
+}
+
+@media (max-width: 768px) {
+  .rooms-table td,
+  .rooms-table th {
+    white-space: nowrap;
+  }
+}

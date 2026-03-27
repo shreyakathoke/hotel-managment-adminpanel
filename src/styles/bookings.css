@@ -1,0 +1,91 @@
+.bookings-search {
+  min-width: 280px;
+  max-width: 420px;
+}
+
+.soft-card {
+  border: 0;
+  border-radius: 14px;
+  box-shadow: 0 10px 30px rgba(10, 20, 30, 0.06);
+}
+
+.kpi-value {
+  font-size: 28px;
+  font-weight: 800;
+  margin-top: 6px;
+}
+
+.bookings-table th {
+  white-space: nowrap;
+  font-size: 14px;
+}
+
+.bookings-table td {
+  vertical-align: middle;
+  font-size: 14px;
+}
+
+@media (max-width: 576px) {
+  .bookings-search {
+    min-width: 100%;
+    max-width: 100%;
+  }
+}
+
+/* ---- Custom modal ---- */
+.modal-backdrop-custom {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 14px;
+  z-index: 1050;
+}
+
+.modal-card {
+  width: 100%;
+  max-width: 820px;
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 20px 55px rgba(0, 0, 0, 0.25);
+  overflow: hidden;
+}
+
+.modal-card-header {
+  padding: 14px 16px;
+  border-bottom: 1px solid #eef0f4;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.modal-card-body {
+  padding: 16px;
+}
+
+.modal-card-footer {
+  padding: 12px 16px;
+  border-top: 1px solid #eef0f4;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.detail-box {
+  border: 1px solid #eef0f4;
+  border-radius: 14px;
+  padding: 12px;
+  background: #fafbfc;
+}
+
+.detail-label {
+  font-size: 12px;
+  color: #6b7280;
+  margin-bottom: 6px;
+}
+
+.detail-value {
+  font-weight: 700;
+}
