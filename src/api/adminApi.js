@@ -84,6 +84,12 @@ export const adminDeleteContact = async (id) => {
 
 // ================= USERS =================
 
+// GET ALL USERS
+export const fetchUsers = async () => {
+  const res = await fetch(`${API_URL}/users`); // You need this endpoint on backend
+  return handleResponse(res);
+};
+
 // GET USER BY EMAIL
 export const fetchUserByEmail = async (email) => {
   const res = await fetch(`${API_URL}/profile/${email}`);

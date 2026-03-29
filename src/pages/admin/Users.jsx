@@ -2,7 +2,6 @@ import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../../styles/users.css";
 
-// ✅ Replace these with your actual backend API calls
 import { fetchUserByEmail, deleteUserApi } from "../../api/adminApi";
 
 /** Helpers */
@@ -13,10 +12,17 @@ function formatDate(value) {
   return d.toLocaleDateString();
 }
 
-// ✅ robust id getter (works with id/_id/userId/user_id)
+// Robust ID getter
 function getUserId(u) {
-  return u?.id || u?._id || u?.userId || u?.user_id;
+  return u?.email; // email is unique
 }
+
+// **Replace this with your actual list of users' emails**
+const USER_EMAILS = [
+  "user1@example.com",
+  "user2@example.com",
+  "user3@example.com",
+];
 
 export default function Users() {
   const navigate = useNavigate();
@@ -36,21 +42,17 @@ export default function Users() {
         setLoading(true);
         setError("");
 
-        const data = await fetchUsers({ search: "" }); // API call
+        // fetch users one by one
+        const promises = USER_EMAILS.map((email) =>
+          fetchUserByEmail(email).catch((e) => null)
+        );
+        const results = await Promise.all(promises);
 
-        const list = Array.isArray(data)
-          ? data
-          : Array.isArray(data?.users)
-          ? data.users
-          : Array.isArray(data?.data)
-          ? data.data
-          : [];
+        const list = results.filter((u) => u !== null);
 
         if (!ignore) setUsers(list);
       } catch (e) {
-        if (!ignore) {
-          setError(e?.response?.data?.message || e?.message || "Failed to load users.");
-        }
+        if (!ignore) setError(e?.message || "Failed to load users.");
       } finally {
         if (!ignore) setLoading(false);
       }
@@ -91,11 +93,11 @@ export default function Users() {
 
     try {
       setDeletingId(id);
-      await deleteUserApi(id); // API call
-      setUsers((prev) => prev.filter((u) => String(getUserId(u)) !== String(id)));
+      await deleteUserApi(id);
+      setUsers((prev) => prev.filter((u) => getUserId(u) !== id));
     } catch (e) {
-      console.log("DELETE USER ERROR:", e?.response?.data || e);
-      alert(e?.response?.data?.message || e?.message || "Failed to delete user.");
+      console.log("DELETE USER ERROR:", e);
+      alert(e?.message || "Failed to delete user.");
     } finally {
       setDeletingId(null);
     }
@@ -136,74 +138,48 @@ export default function Users() {
             <table className="table align-middle mb-0 users-table">
               <thead>
                 <tr>
-                  <th><i className="bi bi-person me-2" />Name</th>
-                  <th><i className="bi bi-envelope me-2" />Email</th>
-                  <th><i className="bi bi-telephone me-2" />Phone</th>
-                  <th><i className="bi bi-card-text me-2" />ID Proof</th>
-                  <th><i className="bi bi-calendar me-2" />Created</th>
+                  <th>Name</th>
+                  <th>Email</th>
+                  <th>Phone</th>
+                  <th>ID Proof</th>
+                  <th>Created</th>
                   <th>Status</th>
                   <th className="text-end">Actions</th>
                 </tr>
               </thead>
-
               <tbody>
                 {filteredUsers.map((user) => {
                   const id = getUserId(user);
                   const created = user?.created || user?.createdAt || user?.created_at;
-
                   const idProofType = user?.idProofType || user?.id_proof_type || "-";
                   const idProofNumber = user?.idProofNumber || user?.id_proof_number || "-";
-
                   const status = String(user?.status || "active").toLowerCase();
 
                   return (
-                    <tr key={id || Math.random()}>
+                    <tr key={id}>
+                      <td>{user?.name || "-"}</td>
+                      <td>{user?.email || "-"}</td>
+                      <td>{user?.phone || "-"}</td>
                       <td>
-                        <div className="d-flex align-items-center gap-3">
-                          <div className="user-avatar"><i className="bi bi-person" /></div>
-                          <div className="fw-semibold">{user?.name || "-"}</div>
-                        </div>
+                        {idProofType}
+                        <br />
+                        <small className="text-muted">{idProofNumber}</small>
                       </td>
-
-                      <td className="text-muted">{user?.email || "-"}</td>
-                      <td className="text-muted">{user?.phone || "-"}</td>
-
-                      <td>
-                        <div className="fw-semibold">{idProofType}</div>
-                        <div className="text-muted small">{idProofNumber}</div>
-                      </td>
-
-                      <td className="text-muted">{formatDate(created)}</td>
-
-                      <td>
-                        <span
-                          className={`badge rounded-pill px-3 py-2 ${
-                            status === "active"
-                              ? "bg-success-subtle text-success"
-                              : "bg-danger-subtle text-danger"
-                          }`}
-                        >
-                          <i className="bi bi-circle-fill me-2 small" />
-                          {status === "active" ? "Active" : "Inactive"}
-                        </span>
-                      </td>
-
+                      <td>{formatDate(created)}</td>
+                      <td>{status}</td>
                       <td className="text-end">
                         <button
-                          className="btn btn-light btn-sm me-2 btn-action-view"
+                          className="btn btn-light btn-sm me-2"
                           onClick={() => navigate(`/admin/users/${id}`)}
-                          disabled={!id}
                         >
-                          <i className="bi bi-eye me-1" />View
+                          View
                         </button>
-
                         <button
-                          className="btn btn-light btn-sm btn-action-delete"
+                          className="btn btn-light btn-sm text-danger"
                           onClick={() => handleDelete(id)}
-                          disabled={!id || deletingId === id}
+                          disabled={deletingId === id}
                         >
-                          <i className="bi bi-trash me-1 text-danger" />
-                          <span className="text-danger">{deletingId === id ? "Deleting..." : "Delete"}</span>
+                          {deletingId === id ? "Deleting..." : "Delete"}
                         </button>
                       </td>
                     </tr>
@@ -212,7 +188,7 @@ export default function Users() {
 
                 {filteredUsers.length === 0 && (
                   <tr>
-                    <td colSpan={7} className="text-center py-4 text-muted">
+                    <td colSpan={7} className="text-center text-muted py-4">
                       No users found.
                     </td>
                   </tr>

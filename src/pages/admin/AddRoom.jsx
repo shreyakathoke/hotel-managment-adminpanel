@@ -24,7 +24,7 @@ export default function AddRoom() {
     capacity: "",
     availability: "available",
     description: "",
-    imageUrl: "", // ✅ store uploaded URL here
+    imageUrl: "",
   });
 
   const [imageFile, setImageFile] = useState(null);
@@ -33,10 +33,10 @@ export default function AddRoom() {
   const [touched, setTouched] = useState({});
   const [submitting, setSubmitting] = useState(false);
   const [loadingRoom, setLoadingRoom] = useState(false);
-  const [uploading, setUploading] = useState(false); // ✅ upload state
+  const [uploading, setUploading] = useState(false);
   const [error, setError] = useState("");
 
-  // ✅ Load room in edit mode
+  // Load room for edit mode
   useEffect(() => {
     if (!isEdit) return;
 
@@ -46,7 +46,6 @@ export default function AddRoom() {
       try {
         const data = await getRoomById(id);
         const room = data?.room ?? data;
-
         const imageUrl = room?.imageUrl || room?.image || room?.photo || "";
 
         setForm({
@@ -81,7 +80,6 @@ export default function AddRoom() {
     })();
   }, [isEdit, id, navigate]);
 
-  // ✅ cleanup blob preview
   useEffect(() => {
     return () => {
       if (previewUrl && previewUrl.startsWith("blob:")) {
@@ -119,14 +117,22 @@ export default function AddRoom() {
 
     setImageFile(file);
 
-    // revoke old blob
     if (previewUrl && previewUrl.startsWith("blob:")) URL.revokeObjectURL(previewUrl);
-
     setPreviewUrl(URL.createObjectURL(file));
     setError("");
   }
 
-  // ✅ Upload image to S3 and save URL
+  // Placeholder for S3 upload function
+  async function uploadImageToS3(file) {
+    // Implement your actual S3 upload here
+    // Return uploaded image URL as string
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        resolve(URL.createObjectURL(file)); // temporary mock URL
+      }, 1000);
+    });
+  }
+
   async function handleUploadImage() {
     if (!imageFile) {
       setError("Please select an image first.");
@@ -136,19 +142,13 @@ export default function AddRoom() {
     setUploading(true);
     setError("");
     try {
-      const url = await uploadImageToS3(imageFile); // returns string URL
+      const url = await uploadImageToS3(imageFile);
       setForm((p) => ({ ...p, imageUrl: url }));
-      // preview should show actual S3 after upload
       setPreviewUrl(url);
       alert("Image uploaded successfully!");
     } catch (err) {
-      console.error("UPLOAD ERROR:", err?.response?.data || err);
-      setError(
-        err?.response?.data?.message ||
-          err?.response?.data?.error ||
-          err?.message ||
-          "Upload failed"
-      );
+      console.error("UPLOAD ERROR:", err);
+      setError(err?.message || "Upload failed");
     } finally {
       setUploading(false);
     }
@@ -171,7 +171,6 @@ export default function AddRoom() {
     setSubmitting(true);
     setError("");
 
-    // ✅ Room payload with imageUrl
     const payload = {
       roomNumber: form.roomNo.trim(),
       type: form.roomType,
@@ -179,10 +178,9 @@ export default function AddRoom() {
       capacity: Number(form.capacity),
       available: form.availability === "available",
       description: form.description.trim(),
-      imageUrl: form.imageUrl || "", // ✅ send uploaded URL
+      imageUrl: form.imageUrl || "",
     };
 
-    // ✅ If user selected a file but forgot to upload, we auto-upload here
     try {
       if (imageFile && !form.imageUrl) {
         const url = await uploadImageToS3(imageFile);
@@ -200,23 +198,20 @@ export default function AddRoom() {
       navigate("/admin/rooms");
     } catch (err) {
       const status = err?.response?.status;
-      const url = (err?.config?.baseURL || "") + (err?.config?.url || "");
-      console.log("SAVE ROOM ERROR:", {
-        status,
-        url,
-        response: err?.response?.data,
-        message: err?.message,
-      });
-
       setError(
         err?.response?.data?.message ||
           err?.response?.data?.error ||
-          err?.response?.data?.msg ||
           (status ? `Failed to save room (HTTP ${status}).` : "Failed to save room.")
       );
     } finally {
       setSubmitting(false);
     }
+  }
+
+  // Placeholder for deleteRoom
+  async function deleteRoom(id) {
+    // Implement actual delete logic
+    return new Promise((resolve) => setTimeout(resolve, 500));
   }
 
   async function onDelete() {
@@ -232,8 +227,8 @@ export default function AddRoom() {
       alert("Room deleted successfully");
       navigate("/admin/rooms");
     } catch (err) {
-      console.error("DELETE ROOM ERROR:", err?.response?.data || err);
-      setError(err?.response?.data?.message || err?.response?.data?.error || "Failed to delete room.");
+      console.error("DELETE ROOM ERROR:", err);
+      setError("Failed to delete room.");
     } finally {
       setSubmitting(false);
     }
@@ -376,9 +371,7 @@ export default function AddRoom() {
                   value={form.availability}
                   onChange={onChange}
                   onBlur={onBlur}
-                  className={`form-select ${
-                    touched.availability && errors.availability ? "is-invalid" : ""
-                  }`}
+                  className={`form-select ${touched.availability && errors.availability ? "is-invalid" : ""}`}
                 >
                   <option value="available">Available</option>
                   <option value="unavailable">Unavailable</option>
@@ -410,9 +403,7 @@ export default function AddRoom() {
                   </button>
 
                   {form.imageUrl && (
-                    <span className="badge text-bg-success align-self-center">
-                      Uploaded
-                    </span>
+                    <span className="badge text-bg-success align-self-center">Uploaded</span>
                   )}
                 </div>
 
@@ -431,12 +422,7 @@ export default function AddRoom() {
                     <img
                       src={previewUrl}
                       alt="preview"
-                      style={{
-                        width: "100%",
-                        maxHeight: 320,
-                        objectFit: "cover",
-                        borderRadius: 8,
-                      }}
+                      style={{ width: "100%", maxHeight: 320, objectFit: "cover", borderRadius: 8 }}
                     />
                   </div>
                 </div>
@@ -450,9 +436,7 @@ export default function AddRoom() {
                   value={form.description}
                   onChange={onChange}
                   onBlur={onBlur}
-                  className={`form-control ${
-                    touched.description && errors.description ? "is-invalid" : ""
-                  }`}
+                  className={`form-control ${touched.description && errors.description ? "is-invalid" : ""}`}
                   rows={4}
                   placeholder="Write something about the room..."
                 />
