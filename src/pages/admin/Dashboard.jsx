@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import "../../styles/dashboard.css";
 
+import { getRooms, adminFetchContacts } from "../../api/adminApi"; // correct imports
 
 /** Helpers */
 function normalizeText(s) {
@@ -69,8 +70,8 @@ function BarList({ title, items }) {
 
 export default function Dashboard() {
   const [loading, setLoading] = useState(true);
-  const [rooms, setRooms] = useState([]);     // from /api/admin/rooms
-  const [profiles, setProfiles] = useState([]); // from /api/profile/all
+  const [rooms, setRooms] = useState([]);
+  const [profiles, setProfiles] = useState([]); // using contacts as profiles
   const [error, setError] = useState("");
 
   useEffect(() => {
@@ -81,18 +82,16 @@ export default function Dashboard() {
         setLoading(true);
         setError("");
 
-        // fetch in parallel
-        const [roomsData, profilesData] = await Promise.all([
-          adminGetRooms(),
-          adminGetAllProfiles(),
+        // fetch rooms and contacts in parallel
+        const [roomsData, contactsData] = await Promise.all([
+          getRooms(),
+          adminFetchContacts(),
         ]);
 
         if (!mounted) return;
 
-        // roomsData = array of rooms
-        // profilesData = array of profiles
         setRooms(Array.isArray(roomsData) ? roomsData : []);
-        setProfiles(Array.isArray(profilesData) ? profilesData : []);
+        setProfiles(Array.isArray(contactsData) ? contactsData : []);
       } catch (err) {
         console.log("DASHBOARD FETCH ERROR:", err?.response?.data || err);
 
@@ -116,31 +115,22 @@ export default function Dashboard() {
   /** KPI Metrics */
   const metrics = useMemo(() => {
     const totalUsers = profiles.length;
-
-    // total rooms = count of rooms (from backend)
     const totalRooms = rooms.length;
-
-    // active rooms = available = true
     const activeRooms = rooms.filter((r) => r?.available === true).length;
     const inactiveRooms = totalRooms - activeRooms;
 
     return { totalUsers, totalRooms, activeRooms, inactiveRooms };
   }, [profiles, rooms]);
 
-  /** Rooms by Category (using room.type) */
+  /** Rooms by Category */
   const roomsByCategory = useMemo(() => {
     return groupCount(rooms, (r) => normalizeText(r?.type));
   }, [rooms]);
 
-  /** Users by City
-   * Your API doc profile fields: phone,address,idProof,photoUrl...
-   * City may not exist. We'll try: profile.city OR profile.address (first word) fallback.
-   */
+  /** Users by City */
   const usersByCity = useMemo(() => {
     return groupCount(profiles, (p) => {
       if (p?.city) return normalizeText(p.city);
-
-      // fallback: use address as "city" like "Pune, Maharashtra..."
       const addr = (p?.address || "").trim();
       if (!addr) return "unknown";
       const guess = addr.split(",")[0];
@@ -148,9 +138,7 @@ export default function Dashboard() {
     });
   }, [profiles]);
 
-  /** Active Rooms Table
-   * show available rooms (true), display: roomNumber + type + pricePerNight
-   */
+  /** Active Rooms Table */
   const activeRoomsList = useMemo(() => {
     return rooms
       .filter((r) => r?.available === true)

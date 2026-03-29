@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import "../../styles/roomDetails.css";
+import { getRoomById } from "../../api/adminApi"; 
 
 
 function Item({ label, value }) {

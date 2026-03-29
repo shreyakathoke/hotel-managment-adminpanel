@@ -2,7 +2,10 @@ import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../../styles/users.css";
 
+// ✅ Replace these with your actual backend API calls
+import { fetchUserByEmail, deleteUserApi } from "../../api/adminApi";
 
+/** Helpers */
 function formatDate(value) {
   if (!value) return "-";
   const d = new Date(value);
@@ -33,7 +36,7 @@ export default function Users() {
         setLoading(true);
         setError("");
 
-        const data = await fetchUsers({ search: "" });
+        const data = await fetchUsers({ search: "" }); // API call
 
         const list = Array.isArray(data)
           ? data
@@ -88,11 +91,7 @@ export default function Users() {
 
     try {
       setDeletingId(id);
-
-      // ✅ API call to backend
-      await deleteUserApi(id);
-
-      // ✅ UI remove (works for any id key)
+      await deleteUserApi(id); // API call
       setUsers((prev) => prev.filter((u) => String(getUserId(u)) !== String(id)));
     } catch (e) {
       console.log("DELETE USER ERROR:", e?.response?.data || e);
@@ -137,26 +136,11 @@ export default function Users() {
             <table className="table align-middle mb-0 users-table">
               <thead>
                 <tr>
-                  <th>
-                    <i className="bi bi-person me-2" />
-                    Name
-                  </th>
-                  <th>
-                    <i className="bi bi-envelope me-2" />
-                    Email
-                  </th>
-                  <th>
-                    <i className="bi bi-telephone me-2" />
-                    Phone
-                  </th>
-                  <th>
-                    <i className="bi bi-card-text me-2" />
-                    ID Proof
-                  </th>
-                  <th>
-                    <i className="bi bi-calendar me-2" />
-                    Created
-                  </th>
+                  <th><i className="bi bi-person me-2" />Name</th>
+                  <th><i className="bi bi-envelope me-2" />Email</th>
+                  <th><i className="bi bi-telephone me-2" />Phone</th>
+                  <th><i className="bi bi-card-text me-2" />ID Proof</th>
+                  <th><i className="bi bi-calendar me-2" />Created</th>
                   <th>Status</th>
                   <th className="text-end">Actions</th>
                 </tr>
@@ -176,9 +160,7 @@ export default function Users() {
                     <tr key={id || Math.random()}>
                       <td>
                         <div className="d-flex align-items-center gap-3">
-                          <div className="user-avatar">
-                            <i className="bi bi-person" />
-                          </div>
+                          <div className="user-avatar"><i className="bi bi-person" /></div>
                           <div className="fw-semibold">{user?.name || "-"}</div>
                         </div>
                       </td>
@@ -212,8 +194,7 @@ export default function Users() {
                           onClick={() => navigate(`/admin/users/${id}`)}
                           disabled={!id}
                         >
-                          <i className="bi bi-eye me-1" />
-                          View
+                          <i className="bi bi-eye me-1" />View
                         </button>
 
                         <button
@@ -222,9 +203,7 @@ export default function Users() {
                           disabled={!id || deletingId === id}
                         >
                           <i className="bi bi-trash me-1 text-danger" />
-                          <span className="text-danger">
-                            {deletingId === id ? "Deleting..." : "Delete"}
-                          </span>
+                          <span className="text-danger">{deletingId === id ? "Deleting..." : "Delete"}</span>
                         </button>
                       </td>
                     </tr>

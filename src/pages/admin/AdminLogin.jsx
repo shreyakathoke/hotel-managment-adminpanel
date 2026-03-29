@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../../styles/adminLogin.css";
-
+import { adminLogin } from "../../api/adminApi"; // ✅ IMPORT
 
 export default function AdminLogin() {
   const navigate = useNavigate();
@@ -23,38 +23,25 @@ export default function AdminLogin() {
     try {
       const data = await adminLogin(form);
 
-      const token =
-        data?.token ||
-        data?.jwt ||
-        data?.accessToken ||
-        data?.data?.token ||
-        data?.data?.jwt;
-
-      if (!token) {
+      // ✅ Your backend returns: { token, admin }
+      if (!data?.token) {
         throw new Error("Token not received from server.");
       }
 
-      localStorage.setItem("admin_token", token);
+      // ✅ STORE LOGIN DATA
+      localStorage.setItem("admin_token", data.token);
       localStorage.setItem("admin_auth", "true");
-      localStorage.setItem("admin_email", data?.admin?.email || data?.email || form.email);
+      localStorage.setItem("admin_email", data?.admin?.email || form.email);
 
+      // ✅ REDIRECT TO DASHBOARD
       navigate("/admin/dashboard", { replace: true });
+
     } catch (err) {
-      // ✅ show exact backend error
-      const status = err?.response?.status;
-      const url = err?.config?.baseURL + (err?.config?.url || "");
-      console.log("ADMIN LOGIN ERROR:", {
-        status,
-        url,
-        data: err?.response?.data,
-        message: err?.message,
-      });
+      console.log("ADMIN LOGIN ERROR:", err);
 
       const msg =
-        err?.response?.data?.message ||
         err?.response?.data?.error ||
-        err?.response?.data?.msg ||
-        (status ? `Request failed (${status}).` : err?.message) ||
+        err?.message ||
         "Invalid email or password";
 
       setError(msg);

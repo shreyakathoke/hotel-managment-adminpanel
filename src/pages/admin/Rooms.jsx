@@ -2,6 +2,8 @@ import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import "../../styles/rooms.css";
+import { getRooms, deleteRoom } from "../../api/adminApi";
+
 
 export default function Rooms() {
   const navigate = useNavigate();
@@ -35,25 +37,25 @@ export default function Rooms() {
   }
 
   async function loadRooms({ silent = false } = {}) {
-    if (!silent) setLoading(true);
-    setError("");
+  if (!silent) setLoading(true);
+  setError("");
 
-    try {
-      const data = await getAdminRooms();
-      const list = Array.isArray(data) ? data : data?.rooms || [];
-      setRooms(list.map(mapRoom));
-    } catch (e) {
-      console.error("GET ROOMS ERROR:", e);
-      setError(
-        e?.response?.data?.message ||
-          e?.response?.data?.error ||
-          "Failed to load rooms. Check API route /api/admin/rooms and token."
-      );
-      setRooms([]);
-    } finally {
-      if (!silent) setLoading(false);
-    }
+  try {
+    const data = await getRooms(); // ✅ FIXED
+    const list = Array.isArray(data) ? data : data?.rooms || [];
+    setRooms(list.map(mapRoom));
+  } catch (e) {
+    console.error("GET ROOMS ERROR:", e);
+    setError(
+      e?.response?.data?.message ||
+        e?.response?.data?.error ||
+        "Failed to load rooms."
+    );
+    setRooms([]);
+  } finally {
+    if (!silent) setLoading(false);
   }
+}
 
   useEffect(() => {
     loadRooms();
@@ -78,25 +80,25 @@ export default function Rooms() {
   }
 
   async function onDelete(roomKey) {
-    const ok = window.confirm("Are you sure you want to delete this room?");
-    if (!ok) return;
+  const ok = window.confirm("Are you sure you want to delete this room?");
+  if (!ok) return;
 
-    setBusyDeleteId(roomKey);
-    try {
-      await deleteAdminRoom(roomKey); // ✅ FIXED
-      setRooms((prev) => prev.filter((r) => r.key !== roomKey)); // ✅ instant UI update
-    } catch (e) {
-      console.error("DELETE ROOM ERROR:", e);
-      alert(
-        e?.response?.data?.message ||
-          e?.response?.data?.error ||
-          "Failed to delete room."
-      );
-    } finally {
-      setBusyDeleteId(null);
-    }
+  setBusyDeleteId(roomKey);
+
+  try {
+    await deleteRoom(roomKey); // ✅ FIXED
+    setRooms((prev) => prev.filter((r) => r.key !== roomKey));
+  } catch (e) {
+    console.error("DELETE ROOM ERROR:", e);
+    alert(
+      e?.response?.data?.message ||
+        e?.response?.data?.error ||
+        "Failed to delete room."
+    );
+  } finally {
+    setBusyDeleteId(null);
   }
-
+}
   return (
     <div className="container-fluid px-3 px-lg-4 py-4">
       {/* Header */}
