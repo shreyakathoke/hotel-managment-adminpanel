@@ -44,14 +44,12 @@ export const createRoom = async (formData) => {
 };
 
 // UPDATE ROOM
-export const updateRoom = async (roomId, data) => {
+export const updateRoom = async (roomId, formData) => {
   const res = await fetch(`${API_URL}/rooms/${roomId}`, {
     method: "PUT",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(data),
+    body: formData,
   });
-
-  return handleResponse(res);
+  return res.json();
 };
 
 // DELETE ROOM
