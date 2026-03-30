@@ -35,14 +35,12 @@ export const getRoomById = async (id) => {
 };
 
 // ADD ROOM
-export const createRoom = async (roomData) => {
+export const createRoom = async (formData) => {
   const res = await fetch(`${API_URL}/rooms`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(roomData),
+    body: formData,
   });
-
-  return handleResponse(res);
+  return res.json();
 };
 
 // UPDATE ROOM
