@@ -1,8 +1,11 @@
+// src/pages/admin/RoomDetails.jsx
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import "../../styles/roomDetails.css";
 import { getRoomById } from "../../api/adminApi"; 
 
+// ✅ Your backend URL – update if needed
+const BACKEND_URL = "https://hotel-managment-backend-production.up.railway.app";
 
 function Item({ label, value }) {
   return (
@@ -23,7 +26,7 @@ export default function RoomDetails() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  // ✅ Load room from backend
+  // ================= LOAD ROOM =================
   useEffect(() => {
     let active = true;
 
@@ -36,7 +39,7 @@ export default function RoomDetails() {
 
         if (!active) return;
 
-        // ✅ normalize different backend field names
+        // Normalize room data
         const normalized = {
           id: r?.roomId || r?._id || r?.id || id,
           roomNo: r?.roomNumber ?? r?.roomNo ?? r?.number ?? "",
@@ -52,20 +55,16 @@ export default function RoomDetails() {
               ? String(r.availability).toLowerCase()
               : "available",
           description: r?.description ?? "",
-          imageUrl: r?.imageUrl ?? r?.image ?? "",
+          imageUrl: r?.imageUrl ?? r?.image ?? "", // raw field from backend
         };
 
         setRoom(normalized);
       } catch (err) {
-        console.error("GET ROOM DETAILS ERROR:", err?.response?.data || err);
+        console.error("GET ROOM DETAILS ERROR:", err);
         if (!active) return;
 
         setRoom(null);
-        setError(
-          err?.response?.data?.message ||
-            err?.response?.data?.error ||
-            "Failed to load room details."
-        );
+        setError("Failed to load room details.");
       } finally {
         if (active) setLoading(false);
       }
@@ -76,6 +75,7 @@ export default function RoomDetails() {
     };
   }, [id]);
 
+  // ================= STATUS BADGE =================
   const statusBadgeClass = useMemo(() => {
     if (!room) return "";
     return room.availability === "available"
@@ -83,6 +83,14 @@ export default function RoomDetails() {
       : "bg-danger-subtle text-danger";
   }, [room]);
 
+  // ================= IMAGE URL HELPER =================
+  const getImageUrl = (url) => {
+    if (!url) return null;
+    if (url.startsWith("http") || url.startsWith("https")) return url;
+    return `${BACKEND_URL}/uploads/${url}`; // prepend backend if relative path
+  };
+
+  // ================= LOADING =================
   if (loading) {
     return (
       <div className="container-fluid px-3 px-lg-4 py-4">
@@ -98,6 +106,7 @@ export default function RoomDetails() {
     );
   }
 
+  // ================= ROOM NOT FOUND =================
   if (!room) {
     return (
       <div className="container-fluid px-3 px-lg-4 py-4">
@@ -119,6 +128,7 @@ export default function RoomDetails() {
     );
   }
 
+  // ================= ROOM DETAILS =================
   return (
     <div className="container-fluid px-3 px-lg-4 py-4">
       <div className="d-flex justify-content-between align-items-start gap-2 flex-wrap mb-4">
@@ -154,8 +164,12 @@ export default function RoomDetails() {
             <div className="card-header soft-card-header fw-bold">Room Image</div>
             <div className="card-body">
               <div className="rd-imgWrap">
-                {room.imageUrl ? (
-                  <img src={room.imageUrl} alt="Room" className="rd-img" />
+                {getImageUrl(room.imageUrl) ? (
+                  <img
+                    src={getImageUrl(room.imageUrl)}
+                    alt="Room"
+                    className="rd-img"
+                  />
                 ) : (
                   <div className="rd-placeholder">No image uploaded</div>
                 )}
@@ -168,19 +182,12 @@ export default function RoomDetails() {
         <div className="col-12 col-lg-7">
           <div className="card soft-card mb-4">
             <div className="card-header soft-card-header fw-bold">Room Information</div>
-
             <div className="card-body">
               <div className="row g-3">
                 <Item label="Room No" value={room.roomNo ? `#${room.roomNo}` : "-"} />
                 <Item label="Room Type" value={room.roomType} />
-                <Item
-                  label="Price / Night"
-                  value={room.price ? `₹${room.price}` : "-"}
-                />
-                <Item
-                  label="Capacity"
-                  value={room.capacity ? `${room.capacity} guests` : "-"}
-                />
+                <Item label="Price / Night" value={room.price ? `₹${room.price}` : "-"} />
+                <Item label="Capacity" value={room.capacity ? `${room.capacity} guests` : "-"} />
               </div>
             </div>
           </div>

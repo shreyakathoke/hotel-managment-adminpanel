@@ -1,4 +1,4 @@
-const API_URL = "https://web-production-d78058.up.railway.app";
+const API_URL = "https://hotel-managment-backend-production.up.railway.app";
 
 // ================= COMMON FETCH HANDLER =================
 const handleResponse = async (res) => {
@@ -9,14 +9,15 @@ const handleResponse = async (res) => {
   return data;
 };
 
-// ================= ADMIN LOGIN =================
+// ================= ADMIN =================
+
+// ADMIN LOGIN
 export const adminLogin = async (data) => {
   const res = await fetch(`${API_URL}/admin/login`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(data),
   });
-
   return handleResponse(res);
 };
 
@@ -29,88 +30,143 @@ export const getRooms = async () => {
 };
 
 // GET SINGLE ROOM
-export const getRoomById = async (id) => {
-  const res = await fetch(`${API_URL}/rooms/${id}`);
+export const getRoomById = async (roomId) => {
+  const res = await fetch(`${API_URL}/rooms/${roomId}`);
   return handleResponse(res);
 };
 
-// ADD ROOM
-export const createRoom = async (formData) => {
+// ADD ROOM (JSON or FormData)
+export const createRoom = async (roomData) => {
+  const isFormData = roomData instanceof FormData;
   const res = await fetch(`${API_URL}/rooms`, {
     method: "POST",
-    body: formData,
+    headers: isFormData ? {} : { "Content-Type": "application/json" },
+    body: isFormData ? roomData : JSON.stringify(roomData),
   });
-  return res.json();
+  return handleResponse(res);
 };
 
 // UPDATE ROOM
-export const updateRoom = async (roomId, formData) => {
+export const updateRoom = async (roomId, data) => {
   const res = await fetch(`${API_URL}/rooms/${roomId}`, {
     method: "PUT",
-    body: formData,
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
   });
-  return res.json();
+  return handleResponse(res);
 };
 
 // DELETE ROOM
 export const deleteRoom = async (roomId) => {
-  const res = await fetch(`${API_URL}/rooms/${roomId}`, {
-    method: "DELETE",
-  });
-
-  return handleResponse(res);
-};
-
-// ================= CONTACTS =================
-
-// GET CONTACTS
-export const adminFetchContacts = async () => {
-  const res = await fetch(`${API_URL}/contacts`);
-  return handleResponse(res);
-};
-
-// DELETE CONTACT
-export const adminDeleteContact = async (id) => {
-  const res = await fetch(`${API_URL}/contacts/${id}`, {
-    method: "DELETE",
-  });
-
+  const res = await fetch(`${API_URL}/rooms/${roomId}`, { method: "DELETE" });
   return handleResponse(res);
 };
 
 // ================= USERS =================
 
-// GET ALL USERS
-export const fetchUsers = async () => {
-  const res = await fetch(`${API_URL}/users`); // You need this endpoint on backend
-  return handleResponse(res);
-};
 
-// GET USER BY EMAIL
-export const fetchUserByEmail = async (email) => {
-  const res = await fetch(`${API_URL}/profile/${email}`);
+// GET ALL USERS
+export const getAllUsers = async () => {
+  const res = await fetch(`${API_URL}/users`); // GET /users returns all users
   return handleResponse(res);
 };
 
 // DELETE USER
-export const deleteUserApi = async (email) => {
+export const deleteUser = async (email) => {
   const res = await fetch(`${API_URL}/users/${email}`, {
     method: "DELETE",
   });
-
   return handleResponse(res);
 };
+
+
+
+
+
 
 // ================= BOOKINGS =================
 
+// CREATE BOOKING// GET BOOKINGS BY USER EMAIL
+
 export const adminGetBookings = async (email) => {
-  const res = await fetch(`${API_URL}/booking/${email}`);
+  // If email is provided, call /booking/:email
+  const endpoint = email ? `${API_URL}/booking/${email}` : `${API_URL}/booking`;
+  const res = await fetch(endpoint);
   return handleResponse(res);
 };
 
+// CANCEL BOOKING
+export const cancelBooking = async (bookingId) => {
+  const res = await fetch(`${API_URL}/booking/cancel`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ bookingId }),
+  });
+  return handleResponse(res);
+};
+export const createBooking = async (data) => {
+  const res = await fetch(`${API_URL}/booking`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+  return handleResponse(res);
+};
+
+
+
 // ================= PAYMENTS =================
 
-export const adminGetPayment = async (bookingId) => {
+// CREATE PAYMENT
+export const createPayment = async (data) => {
+  const res = await fetch(`${API_URL}/payments`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+  return handleResponse(res);
+};
+
+// GET PAYMENT BY BOOKING ID
+export const getPaymentByBookingId = async (bookingId) => {
   const res = await fetch(`${API_URL}/payments/${bookingId}`);
+  return handleResponse(res);
+};
+
+// CANCEL PAYMENT
+export const cancelPayment = async (paymentId) => {
+  const res = await fetch(`${API_URL}/payments/${paymentId}`, {
+    method: "PUT",
+  });
+  return handleResponse(res);
+};
+
+// ================= CONTACTS =================
+
+// GET ALL CONTACTS
+export const adminFetchContacts = async () => {
+  const res = await fetch(`${API_URL}/contacts`);
+  return handleResponse(res);
+};
+
+// CREATE CONTACT
+export const createContact = async (data) => {
+  const res = await fetch(`${API_URL}/contacts`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+  return handleResponse(res);
+};
+
+// GET CONTACT BY ID
+export const getContactById = async (id) => {
+  const res = await fetch(`${API_URL}/contacts/${id}`);
+  return handleResponse(res);
+};
+
+// DELETE CONTACT
+export const adminDeleteContact = async (id) => {
+  const res = await fetch(`${API_URL}/contacts/${id}`, { method: "DELETE" });
   return handleResponse(res);
 };
