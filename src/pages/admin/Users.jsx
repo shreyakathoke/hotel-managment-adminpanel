@@ -1,4 +1,3 @@
-// src/pages/admin/Users.jsx
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../../styles/users.css";
@@ -12,11 +11,11 @@ function formatDate(value) {
   return d.toLocaleDateString();
 }
 
-// Use email as unique ID
 function getUserId(u) {
   return u?.email;
 }
 
+// ================= COMPONENT =================
 export default function Users() {
   const navigate = useNavigate();
   const [users, setUsers] = useState([]);

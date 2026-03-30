@@ -65,10 +65,19 @@ export const deleteRoom = async (roomId) => {
 // ================= USERS =================
 
 
-// GET ALL USERS
-export const getAllUsers = async () => {
-  const res = await fetch(`${API_URL}/users`); // GET /users returns all users
-  return handleResponse(res);
+export const getAllUsers = async (email) => {
+  try {
+    const res = await fetch(`${API_URL}/profile/${email}`);
+    if (!res.ok) {
+      const err = await res.json();
+      throw new Error(err.error || "Failed to fetch profile");
+    }
+    const data = await res.json();
+    return data;
+  } catch (error) {
+    console.error("GET PROFILE ERROR:", error);
+    throw error;
+  }
 };
 
 // DELETE USER
