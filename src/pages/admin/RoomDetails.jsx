@@ -2,13 +2,23 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import "../../styles/roomDetails.css";
-import { getRoomById } from "../../api/adminApi"; 
+import { getRoomById } from "../../api/adminApi";
+
+// ✅ IMPORT IMAGES FROM src/assets
+import room1 from "../../assets/g.jpg";
+import room2 from "../../assets/g1.jpg";
+import room3 from "../../assets/g2.jpg";
 
 // ✅ Your backend URL
 const BACKEND_URL = "https://hotel-managment-backend-production.up.railway.app";
 
-// Fallback image in case room has no image
-const FALLBACK_IMAGE = "/default-room.png"; // put a default image in /public folder
+// ✅ Use imported images (NOT string paths)
+const FALLBACK_IMAGES = [room1, room2, room3];
+
+// Pick random fallback image
+const getRandomFallback = () => {
+  return FALLBACK_IMAGES[Math.floor(Math.random() * FALLBACK_IMAGES.length)];
+};
 
 function Item({ label, value }) {
   return (
@@ -42,7 +52,6 @@ export default function RoomDetails() {
 
         if (!active) return;
 
-        // Normalize room data
         const normalized = {
           id: r?.roomId || r?._id || r?.id || id,
           roomNo: r?.roomNumber ?? r?.roomNo ?? r?.number ?? "",
@@ -58,7 +67,6 @@ export default function RoomDetails() {
               ? String(r.availability).toLowerCase()
               : "available",
           description: r?.description ?? "",
-          // Handle single image or array of images
           imageUrl:
             r?.imageUrl ??
             r?.image ??
@@ -92,8 +100,12 @@ export default function RoomDetails() {
 
   // ================= IMAGE URL HELPER =================
   const getImageUrl = (url) => {
-    if (!url) return FALLBACK_IMAGE; // fallback
-    if (url.startsWith("http") || url.startsWith("https")) return url;
+    if (!url) return getRandomFallback();
+
+    if (url.startsWith("http") || url.startsWith("https")) {
+      return url;
+    }
+
     return `${BACKEND_URL}/uploads/${url}`;
   };
 
@@ -101,7 +113,9 @@ export default function RoomDetails() {
   if (loading) {
     return (
       <div className="container-fluid px-3 px-lg-4 py-4">
-        <button className="btn btn-light border" onClick={() => navigate(-1)}>Back</button>
+        <button className="btn btn-light border" onClick={() => navigate(-1)}>
+          Back
+        </button>
         <div className="card soft-card p-4 mt-3 text-center">
           <div className="spinner-border" role="status" />
           <div className="mt-3">Loading room details...</div>
@@ -114,7 +128,9 @@ export default function RoomDetails() {
   if (!room) {
     return (
       <div className="container-fluid px-3 px-lg-4 py-4">
-        <button className="btn btn-light border" onClick={() => navigate(-1)}>Back</button>
+        <button className="btn btn-light border" onClick={() => navigate(-1)}>
+          Back
+        </button>
         <div className="card soft-card p-4 mt-3">
           <h5 className="fw-bold mb-1">Room not found</h5>
           <div className="text-muted mb-2">No room exists with id: {id}</div>
@@ -129,9 +145,16 @@ export default function RoomDetails() {
     <div className="container-fluid px-3 px-lg-4 py-4">
       {/* Header */}
       <div className="d-flex justify-content-between align-items-start gap-2 flex-wrap mb-4">
-        <button className="btn btn-light border" onClick={() => navigate(-1)}>Back</button>
+        <button className="btn btn-light border" onClick={() => navigate(-1)}>
+          Back
+        </button>
         <div className="d-flex gap-2">
-          <button className="btn btn-outline-warning" onClick={() => navigate(`/admin/rooms/edit/${room.id}`)}>Edit</button>
+          <button
+            className="btn btn-outline-warning"
+            onClick={() => navigate(`/admin/rooms/edit/${room.id}`)}
+          >
+            Edit
+          </button>
         </div>
       </div>
 
@@ -149,23 +172,31 @@ export default function RoomDetails() {
         {/* Image */}
         <div className="col-12 col-lg-5">
           <div className="card soft-card">
-            <div className="card-header soft-card-header fw-bold">Room Image</div>
+            <div className="card-header soft-card-header fw-bold">
+              Room Image
+            </div>
             <div className="card-body">
               <div className="rd-imgWrap">
                 <img
                   src={getImageUrl(room.imageUrl)}
                   alt="Room"
                   className="rd-img"
+                  onError={(e) => {
+                    e.target.onerror = null;
+                    e.target.src = getRandomFallback();
+                  }}
                 />
               </div>
             </div>
           </div>
         </div>
 
-        {/* Details */}
+        {/* Details (UNCHANGED) */}
         <div className="col-12 col-lg-7">
           <div className="card soft-card mb-4">
-            <div className="card-header soft-card-header fw-bold">Room Information</div>
+            <div className="card-header soft-card-header fw-bold">
+              Room Information
+            </div>
             <div className="card-body">
               <div className="row g-3">
                 <Item label="Room No" value={room.roomNo ? `#${room.roomNo}` : "-"} />
@@ -177,7 +208,9 @@ export default function RoomDetails() {
           </div>
 
           <div className="card soft-card">
-            <div className="card-header soft-card-header fw-bold">Description</div>
+            <div className="card-header soft-card-header fw-bold">
+              Description
+            </div>
             <div className="card-body">
               <div className="rd-desc">{room.description || "-"}</div>
             </div>
